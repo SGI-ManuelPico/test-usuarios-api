@@ -15,3 +15,6 @@ class UsuarioService:
 
     async def update(self, usuario_id: str, data: UsuarioUpdate) -> Usuario | None:
         return await self.repository.update(usuario_id, data)
+
+    async def get_all(self, skip: int = 0, limit: int = 100) -> list[Usuario]:
+        return await self.repository.get_all(skip=skip, limit=limit)

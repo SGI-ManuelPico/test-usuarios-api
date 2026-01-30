@@ -56,6 +56,8 @@ def create_dynamic_model(field_definitions: list) -> Type[BaseModel]:
     # Crea la clase al vuelo
     return create_model('DynamicValidator', **fields_dict)
 
+from app.core.validation_registry import ValidationRegistry
+
 def validate_custom_data(custom_data: Dict[str, Any], config_schema: Dict[str, Any]):
     """
     Función principal para llamar desde tu servicio
@@ -63,9 +65,54 @@ def validate_custom_data(custom_data: Dict[str, Any], config_schema: Dict[str, A
     # 1. Obtenemos la lista de campos de la configuración
     fields_def = config_schema.get('fields', [])
     
-    # 2. Creamos el modelo validador específico
+    # 2. Creamos el modelo validador específico para tipos y regex
     DynamicModel = create_dynamic_model(fields_def)
     
-    # 3. Validamos
-    # Si hay errores, Pydantic lanzará ValidationError
-    return DynamicModel.model_validate(custom_data)
+    # 3. Validamos tipos básicos con Pydantic
+    try:
+        validated_data = DynamicModel.model_validate(custom_data)
+    except ValidationError as e:
+        raise e
+
+    # 4. Validaciones Custom (Logic del Registro)
+    custom_errors = []
+    for field in fields_def:
+        name = field.get('name')
+        value = custom_data.get(name)
+        validations = field.get('validations', [])
+        
+        # Si el valor es None y no es requerido, saltamos (Pydantic ya validó el required)
+        if value is None:
+            continue
+            
+        for rule in validations:
+            action = rule.get('action')
+            params = rule.get('params', {})
+            error_message = rule.get('error_message', "Error de validación")
+            
+            try:
+                is_valid = ValidationRegistry.execute(action, value, **params)
+                if not is_valid:
+                    custom_errors.append({
+                        "loc": ["custom_data", name],
+                        "msg": error_message,
+                        "type": "value_error",
+                        "ctx": {"error": ValueError(error_message)}
+                    })
+            except Exception as e:
+                custom_errors.append({
+                    "loc": ["custom_data", name],
+                    "msg": f"Error ejecutando validación {action}: {str(e)}",
+                    "type": "value_error",
+                    "ctx": {"error": e}
+                })
+
+    if custom_errors:
+        # Re-lanzar como ValidationError para mantener consistencia
+        # Nota: Pydantic prefiere que le pases el modelo para crear un ValidationError
+        raise ValidationError.from_exception_data(
+            title="Custom Validation Error",
+            line_errors=custom_errors
+        )
+    
+    return validated_data

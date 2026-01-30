@@ -13,6 +13,11 @@ class FieldOption(BaseModel):
     label: str
     value: Union[str, int]
 
+class ValidationRule(BaseModel):
+    action: str = Field(..., description="Nombre de la validación registrada (ej: numeric_comparation)")
+    params: Dict[str, Any] = Field(..., description="Parámetros para la función de validación")
+    error_message: str = Field(..., description="Mensaje a mostrar si falla")
+
 class FieldDefinition(BaseModel):
     name: str = Field(..., description="La clave del JSON (ej: 'talla_camisa')")
     label: str = Field(..., description="Nombre visible para el humano")
@@ -20,12 +25,12 @@ class FieldDefinition(BaseModel):
     required: bool = False
     options: Optional[List[FieldOption]] = None # Solo en caso de select
     regex: Optional[str] = None # Para validaciones avanzadas
+    validations: Optional[List[ValidationRule]] = [] # Validaciones custom
 
 class ConfigSchema(BaseModel):
     fields: List[FieldDefinition]
 
 class EntityConfigBase(BaseModel):
-    name: Optional[str] = None # Aunque en DB se quitó, a veces es util metadata, pero seguimos el modelo DB
     entity_type: str
     config: ConfigSchema 
 

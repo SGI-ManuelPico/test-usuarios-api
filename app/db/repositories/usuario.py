@@ -25,9 +25,17 @@ class UsuarioRepository:
             try:
                 validate_custom_data(data.custom_data, entity_config.config)
             except ValidationError as e:
+                errors = []
+                for err in e.errors():
+                    err_copy = err.copy()
+                    if "ctx" in err_copy:
+                        del err_copy["ctx"]
+                    if "url" in err_copy:
+                        del err_copy["url"]
+                    errors.append(err_copy)
                 raise HTTPException(
                     status_code=400, 
-                    detail={"message": "Error de validación dinámica", "errors": e.errors()}
+                    detail={"message": "Error de validación dinámica", "errors": errors}
                 )
 
         # 3. Crear el usuario
@@ -66,9 +74,17 @@ class UsuarioRepository:
                 try:
                     validate_custom_data(update_data["custom_data"], entity_config.config)
                 except ValidationError as e:
+                    errors = []
+                    for err in e.errors():
+                        err_copy = err.copy()
+                        if "ctx" in err_copy:
+                            del err_copy["ctx"]
+                        if "url" in err_copy:
+                            del err_copy["url"]
+                        errors.append(err_copy)
                     raise HTTPException(
                         status_code=400, 
-                        detail={"message": "Error de validación dinámica en actualización", "errors": e.errors()}
+                        detail={"message": "Error de validación dinámica en actualización", "errors": errors}
                     )
 
         # 3. Aplicar cambios
@@ -78,3 +94,8 @@ class UsuarioRepository:
         await self.session.commit()
         await self.session.refresh(usuario)
         return usuario
+
+    async def get_all(self, skip: int = 0, limit: int = 100) -> list[Usuario]:
+        query = select(Usuario).offset(skip).limit(limit)
+        result = await self.session.execute(query)
+        return list(result.scalars().all())
