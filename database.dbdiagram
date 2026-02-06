@@ -1,0 +1,60 @@
+{
+  "version": "1.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "detailLevel": "All",
+  "tablePositions": [
+    {
+      "name": "empresas",
+      "schemaName": "public",
+      "x": 21.63100113407258,
+      "y": -90.60150737147177
+    },
+    {
+      "name": "usuarios",
+      "schemaName": "public",
+      "x": 412.53409305695567,
+      "y": -90.60150737147177
+    },
+    {
+      "name": "entity_configs",
+      "schemaName": "public",
+      "x": 786.441398374496,
+      "y": -72.06064925655244
+    }
+  ],
+  "tableGroupCollapseStates": [],
+  "stickyNoteLayouts": [],
+  "referencePaths": [
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "empresas",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "empresa_id"
+      ],
+      "secondTableName": "usuarios",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "empresas",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "empresa_id"
+      ],
+      "secondTableName": "entity_configs",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    }
+  ]
+}

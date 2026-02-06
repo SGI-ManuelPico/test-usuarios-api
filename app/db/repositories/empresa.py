@@ -24,3 +24,8 @@ class EmpresaRepository:
         query = select(Empresa).where(Empresa.id == empresa_id)
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
+
+    async def list_all(self) -> list[Empresa]:
+        query = select(Empresa)
+        result = await self.session.execute(query)
+        return list(result.scalars().all())

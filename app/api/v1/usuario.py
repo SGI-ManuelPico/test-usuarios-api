@@ -29,12 +29,13 @@ async def update_usuario(
 
 @router.get("/", response_model=list[Usuario])
 async def list_usuarios(
+    empresa_id: UUID | None = None,
     skip: int = 0,
     limit: int = 100,
     session: AsyncSession = Depends(get_db)
 ):
     service = UsuarioService(session)
-    return await service.get_all(skip=skip, limit=limit)
+    return await service.get_all(skip=skip, limit=limit, empresa_id=str(empresa_id) if empresa_id else None)
 
 @router.get("/{usuario_id}", response_model=Usuario)
 async def get_usuario(

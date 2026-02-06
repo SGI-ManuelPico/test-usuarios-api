@@ -8,6 +8,12 @@ class FieldTypeEnum(str, Enum):
     INTEGER = "integer"
     BOOLEAN = "boolean"
     SELECT = "select"
+    DATE = "date"
+    DATETIME = "datetime"
+    EMAIL = "email"
+    PHONE = "phone"
+    URL = "url"
+    
 
 class FieldOption(BaseModel):
     label: str

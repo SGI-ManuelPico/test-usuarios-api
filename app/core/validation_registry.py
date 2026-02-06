@@ -4,6 +4,7 @@ from datetime import datetime, date
 class ValidationRegistry:
     _instance = None
     _validators: Dict[str, Callable] = {}
+    _metadata: Dict[str, Dict[str, Any]] = {}
 
     def __new__(cls):
         if cls._instance is None:
@@ -11,11 +12,17 @@ class ValidationRegistry:
         return cls._instance
 
     @classmethod
-    def register(cls, name: str):
+    def register(cls, name: str, metadata: Dict[str, Any] = None):
         def decorator(func: Callable):
             cls._validators[name] = func
+            if metadata:
+                cls._metadata[name] = metadata
             return func
         return decorator
+    
+    @classmethod
+    def get_all_metadata(cls) -> Dict[str, Dict[str, Any]]:
+        return cls._metadata
 
     @classmethod
     def get_validator(cls, name: str) -> Optional[Callable]:
@@ -30,7 +37,14 @@ class ValidationRegistry:
 
 # Generic Validators
 
-@ValidationRegistry.register("numeric_comparation")
+@ValidationRegistry.register("numeric_comparation", metadata={
+    "label": "Min/Max/Equivalencia",
+    "params": [
+        {"name": "operator", "type": "select", "options": ["gt", "lt", "gte", "lte", "eq", "neq"], "label": "Operador"},
+        {"name": "threshold", "type": "number", "label": "Valor límite"}
+    ],
+    "applicable_types": ["integer", "float"]
+})
 def numeric_comparation(value: Any, threshold: float, operator: str) -> bool:
     """
     Compares a numeric value against a threshold.
@@ -56,7 +70,14 @@ def numeric_comparation(value: Any, threshold: float, operator: str) -> bool:
         return val != thresh
     return False
 
-@ValidationRegistry.register("date_comparation")
+@ValidationRegistry.register("date_comparation", metadata={
+    "label": "Fecha relativa",
+    "params": [
+        {"name": "operator", "type": "select", "options": ["gt", "lt", "gte", "lte", "eq", "neq"], "label": "Operador"},
+        {"name": "reference_date", "type": "select", "options": ["now", "today", "custom"], "label": "Fecha referencia"}
+    ],
+    "applicable_types": ["date", "datetime"]
+})
 def date_comparation(value: Any, reference_date: str, operator: str) -> bool:
     """
     Compares a date value against a reference date.

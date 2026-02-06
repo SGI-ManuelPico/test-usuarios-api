@@ -1,11 +1,18 @@
 from typing import Dict, Any, Type, List, Literal, Annotated, Union, Optional
-from pydantic import create_model, Field, BaseModel, ValidationError, StringConstraints
+from datetime import date as py_date, datetime as py_datetime
+from pydantic import create_model, Field, BaseModel, ValidationError, StringConstraints, EmailStr, HttpUrl
 
 # Mapeo de tipos de texto a tipos de Python básicos
 TYPE_MAPPING = {
     "string": str,
     "integer": int,
     "boolean": bool,
+    "float": float,
+    "date": py_date,
+    "datetime": py_datetime,
+    "email": EmailStr,
+    "phone": str, # No hay un tipo PhoneStr estándar en Pydantic base sin dependencias extra
+    "url": HttpUrl,
 }
 
 def create_dynamic_model(field_definitions: list) -> Type[BaseModel]:

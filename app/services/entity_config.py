@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.entity_config import EntityConfigCreate
+from app.schemas.entity_config import EntityConfigCreate, EntityConfigUpdate
 from app.db.repositories.entity_config import EntityConfigRepository
 from app.models.entity_config import EntityConfig
 from uuid import UUID
@@ -11,6 +11,9 @@ class EntityConfigService:
 
     async def create(self, data: EntityConfigCreate) -> EntityConfig:
         return await self.repository.create(data)
+
+    async def update(self, config_id: int, data: EntityConfigUpdate) -> EntityConfig | None:
+        return await self.repository.update(config_id, data)
 
     async def get_config(self, empresa_id: UUID, entity_type: str) -> EntityConfig | None:
         return await self.repository.get_by_empresa_and_entity(empresa_id, entity_type)

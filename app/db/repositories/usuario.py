@@ -95,7 +95,10 @@ class UsuarioRepository:
         await self.session.refresh(usuario)
         return usuario
 
-    async def get_all(self, skip: int = 0, limit: int = 100) -> list[Usuario]:
-        query = select(Usuario).offset(skip).limit(limit)
+    async def get_all(self, skip: int = 0, limit: int = 100, empresa_id: str | None = None) -> list[Usuario]:
+        query = select(Usuario)
+        if empresa_id:
+            query = query.where(Usuario.empresa_id == empresa_id)
+        query = query.offset(skip).limit(limit)
         result = await self.session.execute(query)
         return list(result.scalars().all())

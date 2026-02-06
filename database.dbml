@@ -1,0 +1,30 @@
+Table empresas {
+  id uuid [pk]
+  nombre varchar
+  nit varchar
+  custom_data jsonb
+  creado_en timestamp [default: `now()`]
+  modificado_en timestamp [default: `now()`]
+}
+
+Table usuarios {
+  id uuid [pk]
+  nombre varchar
+  empresa_id uuid [ref: > empresas.id]
+  email varchar [unique]
+  custom_data jsonb
+  password varchar
+  estado boolean [default: true]
+  creado_en timestamp [default: `now()`]
+  modificado_en timestamp [default: `now()`]
+}
+
+Table entity_configs {
+  id uuid [pk]
+  empresa_id uuid [ref: > empresas.id]
+  entity_type varchar
+  config jsonb
+  creado_en timestamp [default: `now()`]
+  modificado_en timestamp [default: `now()`]
+}
+
